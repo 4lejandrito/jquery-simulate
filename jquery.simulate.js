@@ -90,17 +90,23 @@ $.extend( $.simulate.prototype, {
 	},
 
 	plainEvent: function(type) {
-		var event;
+		var event, options = {
+			"type": type,
+			"view": window,
+			"bubbles": true,
+			"cancelable": true
+		};
 
 		try {
-			event = new window.Event( type, {
-				"view": window,
-				"bubbles": true,
-				"cancelable": true
-			} );
+			event = new window.Event( type, options );
 		} catch ( e ) {
-			event = document.createEvent( "Event" );
-			event.initEvent( type, true, false );
+			if (document.createEvent) {
+				event = document.createEvent( "Events" );
+				event.initEvent( type, options.bubbles, options.cancelable, options.view );
+			} else if (document.createEventObject) {
+				event = document.createEventObject();
+				$.extend( event, options );
+			}
 		}
 
 		return event;
